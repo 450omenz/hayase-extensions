@@ -2,7 +2,7 @@
   {
     "id": "badomen.extension.nyaa",
     "name": "Nyaa.si",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "type": "torrent",
     "accuracy": "low",
     "updatePeers": true,
