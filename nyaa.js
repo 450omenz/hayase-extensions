@@ -1,6 +1,4 @@
-import AbstractSource from './abstract.js'
-
-export default new class Nyaa extends AbstractSource {
+export default new class Nyaa {
   base = 'https://nyaasi-api.vercel.app/api/search?q='
 
   async single({ titles, episode }) {
