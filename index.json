@@ -1,25 +1,18 @@
 [
   {
-    "id": "hayase.omenz.extension.nyaa",
-    "name": "Nyaa",
-    "version": "1.1.0",
+    "id": "hayase.extension.nyaa",
+    "name": "Nyaa.si",
+    "version": "1.0.1",
     "type": "torrent",
     "accuracy": "low",
-    "updatePeers": true,
     "ratio": 0,
-    "media": "sub",
-    "languages": ["ALL"],
+    "media": "both",
+    "languages": [
+      "all"
+    ],
     "nsfw": false,
     "icon": "https://nyaa.si/static/favicon.png",
-    "url": "aHR0cHM6Ly9ueWFhc2ktYXBpLnZlcmNlbC5hcHA=",
     "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/index.json",
-    "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/dist/nyaa.js",
-    "options": {
-      "sukebei": {
-        "type": "boolean",
-        "description": "Search Sukebei (18+ content) instead of Nyaa",
-        "default": false
-      }
-    }
+    "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/nyaa.js"
   }
 ]
