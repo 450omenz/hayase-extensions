@@ -1,76 +1,63 @@
 export default new class Nyaa {
   base = 'https://nyaasi-api.vercel.app/api/search'
 
-  async test() {
-    try {
-      const res = await fetch(`${this.base}?q=test`)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      if (!Array.isArray(data)) throw new Error('Unexpected response format')
-      return true
-    } catch (err) {
-      throw new Error(`Nyaa is unreachable: ${err.message}`)
-    }
-  }
-
   async single({ titles, episode, exclusions = [] }) {
     if (!titles?.length) return []
-    const title = this.#bestTitle(titles)
-    const ep    = String(episode ?? '').padStart(2, '0')
-    const q     = `${title.replace(/[^\w\s-]/g, ' ').trim()} ${ep}`.trim()
-    return this.#search({ q, title, episode, exclusions, batch: false })
+    return this.search(titles, episode, exclusions, false)
   }
 
   async batch({ titles, exclusions = [] }) {
     if (!titles?.length) return []
-    const title = this.#bestTitle(titles)
-    const q     = `${title.replace(/[^\w\s-]/g, ' ').trim()} Batch`
-    return this.#search({ q, title, exclusions, batch: true })
+    return this.search(titles, undefined, exclusions, true)
   }
 
   async movie({ titles, resolution, exclusions = [] }) {
     if (!titles?.length) return []
-    const title = this.#bestTitle(titles)
-    const q     = [title.replace(/[^\w\s-]/g, ' ').trim(), resolution ? `${resolution}p` : ''].filter(Boolean).join(' ')
-    return this.#search({ q, title, exclusions, batch: false })
+    return this.search(titles, undefined, exclusions, false, resolution)
   }
 
-  // ---------------------------------------------------------------------------
-  // Private
-  // ---------------------------------------------------------------------------
+  async search(titles, episode, exclusions, batch, resolution) {
+    const latin = titles.filter(t => /[a-zA-Z]/.test(t))
+    const pool  = latin.length ? latin : titles
+    const title = pool.reduce((a, b) => a.length <= b.length ? a : b)
 
-  async #search({ q, title, episode, exclusions, batch }) {
-    const params = new URLSearchParams({
-      q,
-      title,
-      exclusions: exclusions.join(','),
-      batch:      String(batch),
-      ...(episode !== undefined && { episode: String(episode) }),
-    })
+    let q = title.replace(/[^\w\s-]/g, ' ').trim()
+    if (!batch && episode != null) q += ' ' + String(episode).padStart(2, '0')
+    if (batch) q += ' Batch'
+    if (resolution) q += ' ' + resolution + 'p'
 
-    const res = await fetch(`${this.base}?${params}`)
-    if (!res.ok) throw new Error(`Nyaa API error: HTTP ${res.status}. Try again later.`)
+    const params = '?q=' + encodeURIComponent(q)
+      + '&title=' + encodeURIComponent(title)
+      + '&batch=' + String(batch)
+      + (episode != null ? '&episode=' + String(episode) : '')
+      + (exclusions.length ? '&exclusions=' + encodeURIComponent(exclusions.join(',')) : '')
+
+    const res = await fetch(this.base + params)
+    if (!res.ok) return []
 
     const data = await res.json()
-    if (!Array.isArray(data)) throw new Error('Nyaa API returned an unexpected response format.')
+    if (!Array.isArray(data)) return []
 
     return data.map(item => ({
       title:     item.title     || 'Unknown',
-      link:      item.magnet    || item.hash || item.link || '',
+      link:      item.magnet    || item.hash  || item.link || '',
       hash:      item.hash      || '',
       seeders:   Number(item.seeders)   || 0,
       leechers:  Number(item.leechers)  || 0,
       downloads: Number(item.downloads) || 0,
       size:      Number(item.size)      || 0,
       date:      item.date ? new Date(item.date) : new Date(0),
-      accuracy:  item.accuracy || 'low',
+      accuracy:  item.accuracy  || 'low',
       type:      undefined,
     }))
   }
 
-  #bestTitle(titles) {
-    const latin = titles.filter(t => /[a-zA-Z]/.test(t))
-    const pool  = latin.length ? latin : titles
-    return pool.reduce((a, b) => a.length <= b.length ? a : b)
+  async test() {
+    try {
+      const res = await fetch(this.base + '?q=test')
+      return res.ok
+    } catch {
+      return false
+    }
   }
 }()
