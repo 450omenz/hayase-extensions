@@ -21,7 +21,6 @@ export default new class Nyaa {
   
   /**
    * Simple word-overlap similarity score between two strings (0–1).
-   * Gives a rough idea of how much the result title matches the query.
    */
   function similarity(a, b) {
     const wordsA = new Set(normalize(a).split(' ').filter(w => w.length > 1))
@@ -34,13 +33,10 @@ export default new class Nyaa {
   
   /**
    * Check if a result title plausibly contains the given episode number.
-   * Looks for common patterns: "- 03", "E03", "_03", etc.
    */
   function containsEpisode(title, episode) {
     if (episode === undefined || episode === null) return true
-    const ep = String(episode).padStart(2, '0')
     const epNum = String(episode)
-    // Patterns: "- 03", "E03", " 03 ", "_03", "[03]"
     const patterns = [
       new RegExp(`[-_\\s\\[\\(]0*${epNum}[-_\\s\\]\\)v]`, 'i'),
       new RegExp(`E0*${epNum}\\b`, 'i'),
@@ -49,20 +45,17 @@ export default new class Nyaa {
   }
   
   /**
-   * Pick the best title to search with. Prefers the shortest romanized title
-   * since nyaa tends to index those most consistently.
+   * Pick the best title to search with — shortest latin-script title.
    */
   function bestTitle(titles) {
     if (!titles?.length) return ''
-    // Filter out titles that are pure non-latin (e.g. Japanese/Chinese/Korean)
     const latin = titles.filter(t => /[a-zA-Z]/.test(t))
     const pool  = latin.length ? latin : titles
-    // Shortest title tends to be least ambiguous on nyaa
     return pool.reduce((a, b) => (a.length <= b.length ? a : b))
   }
   
   /**
-   * Apply exclusions and accuracy filtering to raw API results.
+   * Apply exclusions, episode filtering, scoring, and sorting to results.
    */
   function filterAndScore(results, { title, episode, exclusions = [], isBatch }) {
     const lowerExclusions = exclusions.map(e => e.toLowerCase())
@@ -70,25 +63,28 @@ export default new class Nyaa {
     return results
       .filter(item => {
         const lower = item.title.toLowerCase()
-        // Drop if any exclusion keyword is in the title
         if (lowerExclusions.some(ex => lower.includes(ex))) return false
-        // For single episode searches, require the episode number to appear
         if (!isBatch && episode !== undefined && !containsEpisode(item.title, episode)) return false
         return true
       })
       .map(item => {
-        const score = similarity(item.title, title)
-        // Mark accuracy based on title similarity score
+        const score    = similarity(item.title, title)
         const accuracy = score >= 0.6 ? 'medium' : 'low'
         return { ...item, accuracy }
       })
-      // Sort by similarity descending so best matches come first
       .sort((a, b) => similarity(b.title, title) - similarity(a.title, title))
   }
   
-  async function searchNyaa(query, fetch) {
-    const res = await fetch(`${BASE}?q=${encodeURIComponent(query)}`)
+  /**
+   * Fetch results from the API, routing to nyaa or sukebei based on options.
+   */
+  async function searchNyaa(query, fetch, options = {}) {
+    const site = options.sukebei ? 'sukebei' : 'nyaa'
+    const url  = `${BASE}?site=${site}&q=${encodeURIComponent(query)}`
+    const res  = await fetch(url)
+  
     if (!res.ok) throw new Error(`Nyaa API error: HTTP ${res.status}. Try again later.`)
+  
     const data = await res.json()
     if (!Array.isArray(data)) throw new Error('Nyaa API returned an unexpected response format.')
     return data
@@ -104,7 +100,7 @@ export default new class Nyaa {
       downloads: Number(item.downloads) || 0,
       size:      Number(item.size)      || 0,
       date:      item.date ? new Date(item.date) : new Date(0),
-      accuracy:  'low',   // default; filterAndScore may upgrade to 'medium'
+      accuracy:  'low',
       type:      undefined,
     }))
   }
@@ -114,10 +110,10 @@ export default new class Nyaa {
   // ---------------------------------------------------------------------------
   
   export default {
-    // FIX: correct signature — (options, fetch), not (_, fetch)
     async test(options, fetch) {
       try {
-        const res = await fetch(`${BASE}?q=one+piece`)
+        const site = options?.sukebei ? 'sukebei' : 'nyaa'
+        const res  = await fetch(`${BASE}?site=${site}&q=test`)
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data = await res.json()
         if (!Array.isArray(data)) throw new Error('Unexpected response format')
@@ -135,8 +131,8 @@ export default new class Nyaa {
       const ep    = String(episode ?? '').padStart(2, '0')
       const q     = `${title.replace(/[^\w\s-]/g, ' ').trim()} ${ep}`.trim()
   
-      const raw     = await searchNyaa(q, fetch)
-      const mapped  = mapResults(raw)
+      const raw    = await searchNyaa(q, fetch, options)
+      const mapped = mapResults(raw)
       return filterAndScore(mapped, { title, episode, exclusions, isBatch: false })
     },
   
@@ -147,7 +143,7 @@ export default new class Nyaa {
       const title = bestTitle(titles)
       const q     = `${title.replace(/[^\w\s-]/g, ' ').trim()} Batch`
   
-      const raw    = await searchNyaa(q, fetch)
+      const raw    = await searchNyaa(q, fetch, options)
       const mapped = mapResults(raw)
       return filterAndScore(mapped, { title, exclusions, isBatch: true })
     },
@@ -160,7 +156,7 @@ export default new class Nyaa {
       const q     = [title.replace(/[^\w\s-]/g, ' ').trim(), resolution ? `${resolution}p` : '']
         .filter(Boolean).join(' ')
   
-      const raw    = await searchNyaa(q, fetch)
+      const raw    = await searchNyaa(q, fetch, options)
       const mapped = mapResults(raw)
       return filterAndScore(mapped, { title, exclusions, isBatch: false })
     },
