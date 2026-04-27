@@ -32,9 +32,10 @@ export default new class Nyaa {
       downloads: Number(item.downloads || 0),
       size: item.size || 0,
       date: item.date ? new Date(item.date) : null,
-      accuracy: item.accuracy || 'medium',
-      type: item.type || 'alt'
+      accuracy: 'medium',
+      type: 'alt'
     }))
+  .sort((a, b) => b.seeders - a.seeders)
   }
 
   async test() {
