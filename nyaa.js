@@ -49,7 +49,6 @@ export default new class Nyaa {
       size:      Number(item.size)      || 0,
       date:      item.date ? new Date(item.date) : new Date(0),
       accuracy:  item.accuracy  || 'low',
-      type:      undefined,
     }))
   }
 
