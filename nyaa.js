@@ -1,5 +1,5 @@
 export default new class Nyaa {
-  base = 'https://your-project.vercel.app/api/search?q='
+  base = 'https://nyaasi-api.vercel.app/api/search?q='
 
   async single({ titles, episode }) {
     if (!titles?.length) return []
