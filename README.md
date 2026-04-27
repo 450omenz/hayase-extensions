@@ -3,4 +3,5 @@ Alternative to [HayasexShiru Extensions](https://github.com/ReWelp/HayasexShiru-
 
 ## Installation
 Paste this URL into Settings → Extensions → Repositories:
-https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/index.json
+`https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/index.json`
+or simply `gh:450omenz/hayase-extensions`
