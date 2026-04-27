@@ -7,11 +7,26 @@
     "accuracy": "medium",
     "updatePeers": true,
     "ratio": 0,
-    "media": "sub",
+    "media": "both",
     "languages": ["ALL"],
     "nsfw": false,
     "icon": "https://nyaa.si/static/favicon.png",
     "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/main/index.json",
     "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/main/nyaa.js"
+  },
+  {
+    "id": "badomen.extension.sukebei",
+    "name": "Sukebei",
+    "version": "1.0.1",
+    "type": "torrent",
+    "accuracy": "medium",
+    "updatePeers": true,
+    "ratio": 0,
+    "media": "both",
+    "languages": ["ALL"],
+    "nsfw": true,
+    "icon": "https://nyaa.si/static/favicon.png",
+    "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/main/index.json",
+    "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/main/sukebei.js"
   }
 ]
