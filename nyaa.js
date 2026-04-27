@@ -1,10 +1,9 @@
 export default new class Nyaa {
   base = 'https://nyaasi-api.vercel.app/api/search'
 
-  async test(options, fetch) {
+  async test() {
     try {
-      const site = options?.sukebei ? 'sukebei' : 'nyaa'
-      const res  = await fetch(`${this.base}?site=${site}&q=test`)
+      const res = await fetch(`${this.base}?q=test`)
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       if (!Array.isArray(data)) throw new Error('Unexpected response format')
@@ -14,41 +13,37 @@ export default new class Nyaa {
     }
   }
 
-  async single(query, options, fetch) {
-    const { titles, episode, exclusions = [] } = query
+  async single({ titles, episode, exclusions = [] }) {
     if (!titles?.length) return []
     const title = this.#bestTitle(titles)
     const ep    = String(episode ?? '').padStart(2, '0')
     const q     = `${title.replace(/[^\w\s-]/g, ' ').trim()} ${ep}`.trim()
-    return this.#search({ q, title, episode, exclusions, batch: false, options, fetch })
+    return this.#search({ q, title, episode, exclusions, batch: false })
   }
 
-  async batch(query, options, fetch) {
-    const { titles, exclusions = [] } = query
+  async batch({ titles, exclusions = [] }) {
     if (!titles?.length) return []
     const title = this.#bestTitle(titles)
     const q     = `${title.replace(/[^\w\s-]/g, ' ').trim()} Batch`
-    return this.#search({ q, title, exclusions, batch: true, options, fetch })
+    return this.#search({ q, title, exclusions, batch: true })
   }
 
-  async movie(query, options, fetch) {
-    const { titles, resolution, exclusions = [] } = query
+  async movie({ titles, resolution, exclusions = [] }) {
     if (!titles?.length) return []
     const title = this.#bestTitle(titles)
     const q     = [title.replace(/[^\w\s-]/g, ' ').trim(), resolution ? `${resolution}p` : ''].filter(Boolean).join(' ')
-    return this.#search({ q, title, exclusions, batch: false, options, fetch })
+    return this.#search({ q, title, exclusions, batch: false })
   }
 
   // ---------------------------------------------------------------------------
   // Private
   // ---------------------------------------------------------------------------
 
-  async #search({ q, title, episode, exclusions, batch, options, fetch }) {
+  async #search({ q, title, episode, exclusions, batch }) {
     const params = new URLSearchParams({
       q,
       title,
       exclusions: exclusions.join(','),
-      site:       options?.sukebei ? 'sukebei' : 'nyaa',
       batch:      String(batch),
       ...(episode !== undefined && { episode: String(episode) }),
     })
