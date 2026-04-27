@@ -28,6 +28,7 @@ export default new class Nyaa {
 
     const params = '?q=' + encodeURIComponent(q)
       + '&title=' + encodeURIComponent(title)
+      + '&category=1_0'  // anime only
       + '&batch=' + String(batch)
       + (episode != null ? '&episode=' + String(episode) : '')
       + (exclusions.length ? '&exclusions=' + encodeURIComponent(exclusions.join(',')) : '')
@@ -54,7 +55,7 @@ export default new class Nyaa {
 
   async test() {
     try {
-      const res = await fetch(this.base + '?q=test')
+      const res = await fetch(this.base + '?q=test&category=1_0')
       return res.ok
     } catch {
       return false
