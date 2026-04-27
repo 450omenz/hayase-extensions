@@ -1,5 +1,5 @@
 export default new class Nyaa {
-  base = 'https://nyaasi-api.vercel.app/api/search?q='
+  base = 'https://nyaasi-api.vercel.app/api/search'
 
   async single({ titles, episode }) {
     if (!titles?.length) return []
@@ -17,23 +17,27 @@ export default new class Nyaa {
         query += ` ${String(episode).padStart(2, '0')}`
       }
 
-      const res = await fetch(this.base + encodeURIComponent(query))
+      const url = `${this.base}?q=${encodeURIComponent(query)}`
+      const res = await fetch(url)
       if (!res.ok) return []
 
       const data = await res.json()
-      if (!Array.isArray(data)) return []
 
-      return data.map(item => ({
+      // FIX: API returns { query, page, results: [...] }, not a bare array
+      const results = Array.isArray(data) ? data : data?.results
+      if (!Array.isArray(results)) return []
+
+      return results.map(item => ({
         title: item.title || 'Unknown',
-        link: item.link || '',
+        link: item.magnet || item.link || '',  // FIX: Hayase needs a magnet URI, not a page URL
         hash: item.hash || '',
-        seeders: Number(item.seeders || 0),
-        leechers: Number(item.leechers || 0),
-        downloads: Number(item.downloads || 0),
+        seeders: Number(item.seeders) || 0,
+        leechers: Number(item.leechers) || 0,
+        downloads: Number(item.downloads) || 0,
         size: item.size || 0,
         date: item.date ? new Date(item.date) : new Date(0),
-        accuracy: item.accuracy || 'medium',
-        type: item.type || 'alt'
+        accuracy: 'high',
+        type: 'alt'
       }))
     } catch {
       return []
@@ -42,8 +46,11 @@ export default new class Nyaa {
 
   async test() {
     try {
-      const res = await fetch(this.base + 'one%20piece')
-      return res.ok
+      const res = await fetch(`${this.base}?q=one%20piece`)
+      if (!res.ok) return false
+      const data = await res.json()
+      // FIX: check the actual response shape
+      return Array.isArray(data?.results)
     } catch {
       return false
     }
