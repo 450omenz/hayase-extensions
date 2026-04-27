@@ -2,17 +2,17 @@
   {
     "id": "hayase.omenz.extension.nyaa",
     "name": "Nyaa",
-    "version": "1.0",
+    "version": "1.1",
     "type": "torrent",
-    "accuracy": "medium",
+    "accuracy": "low",
+    "updatePeers": true,
     "ratio": 0,
     "media": "sub",
-    "languages": [
-      "all"
-    ],
+    "languages": ["ALL"],
     "nsfw": false,
     "icon": "https://nyaa.si/static/favicon.png",
-    "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/index.js",
+    "url": "aHR0cHM6Ly9ueWFhc2ktYXBpLnZlcmNlbC5hcHA=",
+    "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/index.json",
     "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/nyaa.js"
   }
 ]
