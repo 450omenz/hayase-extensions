@@ -4,7 +4,7 @@
     "name": "Nyaa.si",
     "version": "1.0.1",
     "type": "torrent",
-    "accuracy": "low",
+    "accuracy": "medium",
     "updatePeers": true,
     "ratio": 0,
     "media": "sub",
