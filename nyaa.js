@@ -1,22 +1,25 @@
 export default new class Nyaa {
   base = 'https://nyaasi-api.vercel.app/api/search'
 
-  async single({ titles, episode, exclusions = [] }) {
+  async single(query) {
+    const { titles, episode, exclusions = [], fetch } = query
     if (!titles?.length) return []
-    return this.search(titles, episode, exclusions, false)
+    return this.search(titles, episode, exclusions, false, undefined, fetch)
   }
 
-  async batch({ titles, exclusions = [] }) {
+  async batch(query) {
+    const { titles, exclusions = [], fetch } = query
     if (!titles?.length) return []
-    return this.search(titles, undefined, exclusions, true)
+    return this.search(titles, undefined, exclusions, true, undefined, fetch)
   }
 
-  async movie({ titles, resolution, exclusions = [] }) {
+  async movie(query) {
+    const { titles, resolution, exclusions = [], fetch } = query
     if (!titles?.length) return []
-    return this.search(titles, undefined, exclusions, false, resolution)
+    return this.search(titles, undefined, exclusions, false, resolution, fetch)
   }
 
-  async search(titles, episode, exclusions, batch, resolution) {
+  async search(titles, episode, exclusions, batch, resolution, fetch) {
     const latin = titles.filter(t => /[a-zA-Z]/.test(t))
     const pool  = latin.length ? latin : titles
     const title = pool.reduce((a, b) => a.length <= b.length ? a : b)
@@ -28,7 +31,7 @@ export default new class Nyaa {
 
     const params = '?q=' + encodeURIComponent(q)
       + '&title=' + encodeURIComponent(title)
-      + '&category=1_0'  // anime only
+      + '&category=1_0'
       + '&batch=' + String(batch)
       + (episode != null ? '&episode=' + String(episode) : '')
       + (exclusions.length ? '&exclusions=' + encodeURIComponent(exclusions.join(',')) : '')
@@ -52,7 +55,7 @@ export default new class Nyaa {
     }))
   }
 
-  async test() {
+  async test(options, fetch) {
     try {
       const res = await fetch(this.base + '?q=test&category=1_0')
       return res.ok
