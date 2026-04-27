@@ -11,23 +11,29 @@ export default new class Nyaa {
 
   async search(title, episode) {
     let query = title.replace(/[^\w\s-]/g, ' ').trim()
-    if (episode) query += ` ${episode.toString().padStart(2, '0')}`
 
-    const res = await fetch(this.base + encodeURIComponent(query))
+    if (episode) {
+      query += ` ${episode.toString().padStart(2, '0')}`
+    }
+
+    // ❗ FIX: remove encodeURIComponent (already handled by API usage)
+    const res = await fetch(this.base + query)
+
     const data = await res.json()
+
     if (!Array.isArray(data)) return []
 
     return data.map(item => ({
-      title: item.Name,
-      link: item.Magnet,
-      hash: item.Magnet?.match(/btih:([A-Fa-f0-9]+)/)?.[1] || '',
-      seeders: Number(item.Seeders || 0),
-      leechers: Number(item.Leechers || 0),
-      downloads: Number(item.Downloads || 0),
-      size: 0,
-      date: new Date(item.DateUploaded),
-      accuracy: 'medium',
-      type: 'alt'
+      title: item.title,
+      link: item.link,
+      hash: item.hash || '',
+      seeders: Number(item.seeders || 0),
+      leechers: Number(item.leechers || 0),
+      downloads: Number(item.downloads || 0),
+      size: item.size || 0,
+      date: item.date ? new Date(item.date) : null,
+      accuracy: item.accuracy || 'medium',
+      type: item.type || 'alt'
     }))
   }
 
