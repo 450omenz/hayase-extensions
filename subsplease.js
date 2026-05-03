@@ -24,13 +24,16 @@ export default new class SubsPlease {
     const pool  = latin.length ? latin : titles
     const title = pool.reduce((a, b) => a.length <= b.length ? a : b)
 
-    let q = title.replace(/[^\w\s-]/g, ' ').trim()
+    // Prepend SubsPlease to search query — they upload to nyaa consistently
+    let q = 'SubsPlease ' + title.replace(/[^\w\s-]/g, ' ').trim()
     if (!batch && episode != null) q += ' ' + String(episode).padStart(2, '0')
     if (batch) q += ' Batch'
+    if (resolution) q += ' ' + resolution + 'p'
 
     const params = '?q=' + encodeURIComponent(q)
       + '&title=' + encodeURIComponent(title)
-      + '&site=subsplease'
+      + '&site=nyaa'
+      + '&category=1_0'
       + '&batch=' + String(batch)
       + (episode != null         ? '&episode='         + String(episode)         : '')
       + (absoluteEpisode != null ? '&absoluteEpisode=' + String(absoluteEpisode) : '')
@@ -45,7 +48,7 @@ export default new class SubsPlease {
 
     return data.map(item => ({
       title:     item.title     || 'Unknown',
-      link:      item.link      || item.hash || '',
+      link:      item.magnet    || item.hash || item.link || '',
       hash:      item.hash      || '',
       seeders:   Number(item.seeders)   || 0,
       leechers:  Number(item.leechers)  || 0,
@@ -58,7 +61,7 @@ export default new class SubsPlease {
 
   async test(options, fetch) {
     try {
-      const res = await fetch(this.base + '?q=test&site=subsplease')
+      const res = await fetch(this.base + '?q=SubsPlease&site=nyaa&category=1_0')
       return res.ok
     } catch {
       return false
