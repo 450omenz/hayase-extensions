@@ -48,7 +48,7 @@
     "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/dist/tokyotosho.js"
   },
   {
-    "id": "badomen.omenz.extension.subsplease",
+    "id": "badomen.extension.subsplease",
     "name": "SubsPlease",
     "version": "1.0.0",
     "type": "torrent",
@@ -65,5 +65,4 @@
     "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/index.json",
     "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/dist/subsplease.js"
   }
-
 ]
