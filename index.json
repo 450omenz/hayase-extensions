@@ -28,5 +28,42 @@
     "icon": "https://nyaa.si/static/favicon.png",
     "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/main/index.json",
     "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/main/sukebei.js"
+  },
+  {
+    "id": "badomen.extension.tokyotosho",
+    "name": "Tokyo Toshokan",
+    "version": "1.0.0",
+    "type": "torrent",
+    "accuracy": "low",
+    "updatePeers": true,
+    "ratio": 0,
+    "media": "sub",
+    "languages": [
+      "ALL"
+    ],
+    "nsfw": false,
+    "icon": "https://www.tokyotosho.info/images/favicon.ico",
+    "url": "aHR0cHM6Ly9ueWFhc2ktYXBpLnZlcmNlbC5hcHA=",
+    "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/index.json",
+    "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/dist/tokyotosho.js"
+  },
+  {
+    "id": "badomen.omenz.extension.subsplease",
+    "name": "SubsPlease",
+    "version": "1.0.0",
+    "type": "torrent",
+    "accuracy": "medium",
+    "updatePeers": true,
+    "ratio": 0,
+    "media": "sub",
+    "languages": [
+      "US"
+    ],
+    "nsfw": false,
+    "icon": "https://subsplease.org/favicon.ico",
+    "url": "aHR0cHM6Ly9ueWFhc2ktYXBpLnZlcmNlbC5hcHA=",
+    "update": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/index.json",
+    "code": "https://raw.githubusercontent.com/450omenz/hayase-extensions/refs/heads/main/dist/subsplease.js"
   }
+
 ]
