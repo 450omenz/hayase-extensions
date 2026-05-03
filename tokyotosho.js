@@ -24,6 +24,8 @@ export default new class TokyoTosho {
     const pool  = latin.length ? latin : titles
     const title = pool.reduce((a, b) => a.length <= b.length ? a : b)
 
+    // Tokyo Tosho mirrors to nyaa — search nyaa filtering to their uploads
+    // Their releases are typically tagged as non-English or raw categories
     let q = title.replace(/[^\w\s-]/g, ' ').trim()
     if (!batch && episode != null) q += ' ' + String(episode).padStart(2, '0')
     if (batch) q += ' Batch'
@@ -31,7 +33,8 @@ export default new class TokyoTosho {
 
     const params = '?q=' + encodeURIComponent(q)
       + '&title=' + encodeURIComponent(title)
-      + '&site=tokyotosho'
+      + '&site=nyaa'
+      + '&category=1_0'
       + '&batch=' + String(batch)
       + (episode != null         ? '&episode='         + String(episode)         : '')
       + (absoluteEpisode != null ? '&absoluteEpisode=' + String(absoluteEpisode) : '')
@@ -46,7 +49,7 @@ export default new class TokyoTosho {
 
     return data.map(item => ({
       title:     item.title     || 'Unknown',
-      link:      item.link      || item.hash || '',
+      link:      item.magnet    || item.hash || item.link || '',
       hash:      item.hash      || '',
       seeders:   Number(item.seeders)   || 0,
       leechers:  Number(item.leechers)  || 0,
@@ -59,7 +62,7 @@ export default new class TokyoTosho {
 
   async test(options, fetch) {
     try {
-      const res = await fetch(this.base + '?q=test&site=tokyotosho')
+      const res = await fetch(this.base + '?q=test&site=nyaa&category=1_0')
       return res.ok
     } catch {
       return false
