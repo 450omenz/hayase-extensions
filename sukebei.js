@@ -2,19 +2,19 @@ const base = 'https://nyaasi-api.vercel.app/api/search'
 
 export default {
   async single(query, options) {
-    const { titles, episode, absoluteEpisodeNumber, exclusions = [], resolution, fetch } = query
+    const { titles, episode, absoluteEpisodeNumber, exclusions = [], resolution, fetch = globalThis.fetch } = query
     if (!titles?.length) return []
     return search({ titles, episode, absoluteEpisode: absoluteEpisodeNumber, exclusions, resolution, batch: false, fetch })
   },
 
   async batch(query, options) {
-    const { titles, exclusions = [], fetch } = query
+    const { titles, exclusions = [], fetch = globalThis.fetch } = query
     if (!titles?.length) return []
     return search({ titles, exclusions, batch: true, fetch })
   },
 
   async movie(query, options) {
-    const { titles, resolution, exclusions = [], fetch } = query
+    const { titles, resolution, exclusions = [], fetch = globalThis.fetch } = query
     if (!titles?.length) return []
     return search({ titles, exclusions, resolution, batch: false, fetch })
   },
@@ -58,7 +58,7 @@ async function search({ titles, episode, absoluteEpisode, exclusions, resolution
 
   return data.map(item => ({
     title:     item.title     || 'Unknown',
-    link:      item.magnet    || item.hash  || item.link || '',
+    link:      item.link      || item.magnet || '',
     hash:      item.hash      || '',
     seeders:   Number(item.seeders)   || 0,
     leechers:  Number(item.leechers)  || 0,
